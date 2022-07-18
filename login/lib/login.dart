@@ -31,19 +31,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isObscure = true;
 
-  TextEditingController usernameController = new TextEditingController();
-  TextEditingController passwordController = new TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Container(
             margin: const EdgeInsets.all(10.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'Username:',
@@ -70,6 +71,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           Container(
             margin: const EdgeInsets.all(10.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'Password:',
@@ -78,6 +80,15 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 TextFormField(
                   controller: passwordController,
                   obscureText: _isObscure,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter some text';
+                    }
+                    if (value != '123456') {
+                      return 'Password is incorrect!';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                       labelText: 'Password',
                       // this button is used to toggle the password visibility
