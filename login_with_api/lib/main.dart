@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:login/login.dart';
 
@@ -42,6 +43,19 @@ class Home extends StatelessWidget {
                   ),
                 ],
               ),
+              Container(
+                  child: FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    CupertinoPageRoute(builder: (context) => Login()),
+                    (_) => false,
+                  );
+                },
+                child: Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.red),
+                ),
+              )),
             ]));
   }
 }
