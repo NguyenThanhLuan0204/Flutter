@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:login/main.dart';
+import 'package:login/register.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 void main() => runApp(const Login());
 
@@ -34,6 +34,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  late String jsonString;
+  late String email;
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +48,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/register.png'),
-                    fit: BoxFit.cover),
+                    image: AssetImage('assets/login.png'), fit: BoxFit.cover),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -66,14 +67,14 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Username:',
+                          'Username or Email:',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                         TextFormField(
                           controller: usernameController,
                           decoration: const InputDecoration(
-                            hintText: 'Enter your Username',
+                            hintText: 'Enter your Username or Email',
                           ),
                         ),
                       ],
@@ -94,7 +95,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                           controller: passwordController,
                           obscureText: _isObscure,
                           decoration: InputDecoration(
-                              labelText: 'Password',
+                              labelText: 'Enter your Password',
                               // this button is used to toggle the password visibility
                               suffixIcon: IconButton(
                                   icon: Icon(_isObscure
@@ -109,63 +110,88 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(100),
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        // Validate returns true if the form is valid, or false otherwise.
-                        var headers = {'Content-Type': 'application/json'};
-                        var request = http.Request(
-                            'POST',
-                            Uri.parse(
-                                'https://dakshow.vn/api/auth/login?locale=en'));
-                        request.body = json.encode({
-                          "usernameOrEmail": usernameController.text.toString(),
-                          "password": passwordController.text.toString(),
-                          "remember_me": true
-                        });
-                        request.headers.addAll(headers);
+                  IntrinsicWidth(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          ElevatedButton(
+                            onPressed: () async {
+                              // Validate returns true if the form is valid, or false otherwise.
+                              var headers = {
+                                'Content-Type': 'application/json'
+                              };
+                              var request = http.Request(
+                                  'POST',
+                                  Uri.parse(
+                                      'https://dakshow.vn/api/auth/login?locale=en'));
+                              request.body = json.encode({
+                                "usernameOrEmail":
+                                    usernameController.text.toString(),
+                                "password": passwordController.text.toString(),
+                                "remember_me": true
+                              });
+                              request.headers.addAll(headers);
 
-                        http.StreamedResponse response = await request.send();
+                              http.StreamedResponse response =
+                                  await request.send();
 
-                        if (response.statusCode == 200) {
-                          String jsonString =
-                              await response.stream.bytesToString();
-                          print(jsonString);
-                          var jsoncode = jsonString.substring(8, 11);
-                          int jsoncodenumber = int.parse(jsoncode);
-                          if (jsoncodenumber == 200) {
-                            _sendDataToSecondScreen(context);
-                          } else {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("Thông báo"),
-                                    content: Text(
-                                        'Thông tin đăng nhập sai, kiểm tra lại!'),
-                                    actions: [
-                                      FlatButton(
-                                        child: Text("Ok"),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      )
-                                    ],
-                                  );
-                                });
-                          }
-                        } else {
-                          print(response.reasonPhrase);
-                        }
-                      },
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      ),
-                    ),
-                  )
+                              if (response.statusCode == 200) {
+                                jsonString =
+                                    await response.stream.bytesToString();
+                                //print(jsonString);
+
+                                var jsoncode = jsonString.substring(8, 11);
+                                int jsoncodenumber = int.parse(jsoncode);
+                                if (jsoncodenumber == 200) {
+                                  _sendDataToSecondScreen(context);
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text("Thông báo"),
+                                          content: const Text(
+                                              'Thông tin đăng nhập sai, kiểm tra lại!'),
+                                          actions: [
+                                            FlatButton(
+                                              child: const Text("Ok"),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            )
+                                          ],
+                                        );
+                                      });
+                                }
+                              } else {
+                                print(response.reasonPhrase);
+                              }
+                            },
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20),
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<
+                                        Color>(
+                                    const Color.fromARGB(255, 222, 222, 84))),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Register()));
+                            },
+                            child: const Text(
+                              'Register',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20),
+                            ),
+                          ),
+                        ]),
+                  ),
                 ],
               ),
             ),
@@ -176,15 +202,24 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 
   void _sendDataToSecondScreen(BuildContext context) {
-    String usernameSent = usernameController.text;
-    String passwordSent = passwordController.text;
+    String usernameSend = usernameController.text;
+    String passwordSend = passwordController.text;
     Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => Home(
-            username: usernameSent,
-            password: passwordSent,
+            name: _findAndCut(jsonString, '"name":"', '",'),
+            username: usernameSend,
+            email: _findAndCut(jsonString, '"email":"', '",'),
+            password: passwordSend,
           ),
         ));
+  }
+
+  String _findAndCut(str, start, end) {
+    final startIndex = str.indexOf(start);
+    final endIndex = str.indexOf(end, startIndex + start.length);
+    return str.substring(
+        startIndex + start.length, endIndex); // brown fox jumps
   }
 }

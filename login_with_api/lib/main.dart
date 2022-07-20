@@ -5,12 +5,19 @@ import 'package:login/login.dart';
 void main() => runApp(const Login());
 
 class Home extends StatelessWidget {
+  final String name;
   final String username;
+  final String email;
   final String password;
 
   // receive data from the FirstScreen as a parameter
-  const Home({Key? key, required this.username, required this.password})
-      : super(key: key);
+  const Home({
+    Key? key,
+    required this.name,
+    required this.username,
+    required this.email,
+    required this.password,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +29,35 @@ class Home extends StatelessWidget {
               Row(
                 children: [
                   const Text(
+                    'Name:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  Text(
+                    name,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Text(
                     'Username:',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   Text(
                     username,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Text(
+                    'email:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  Text(
+                    email,
                     style: const TextStyle(fontSize: 18),
                   ),
                 ],
@@ -43,19 +74,34 @@ class Home extends StatelessWidget {
                   ),
                 ],
               ),
-              Container(
-                  child: FlatButton(
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.5);
+                      }
+                      return null; // Use the component's default.
+                    },
+                  ),
+                ),
                 onPressed: () {
                   Navigator.of(context).pushAndRemoveUntil(
-                    CupertinoPageRoute(builder: (context) => Login()),
+                    CupertinoPageRoute(builder: (context) => const Login()),
                     (_) => false,
                   );
                 },
-                child: Text(
+                child: const Text(
                   "Logout",
-                  style: TextStyle(color: Colors.red),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
                 ),
-              )),
+              )
             ]));
   }
 }
